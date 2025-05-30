@@ -1,0 +1,348 @@
+{% extends 'employees/base.html' %}
+
+{% block content %}
+<div class="main-content">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-left">
+                <a href="{% url 'dashboard' %}" class="back-btn me-3">
+                    <i class="fas fa-chevron-left"></i>
+                </a>
+                <h1 class="header-title" style="font-size: 1.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Employee List</h1>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <a href="{% url 'employee_create' %}" class="btn btn-primary">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Add New Employee
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="search-card">
+                <form method="get" class="search-form">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" name="search" class="form-control" placeholder="Search employees by name, position, or description..." value="{{ request.GET.search }}">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>
+                            Search
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 30%">Name</th>
+                                <th style="width: 20%">Position</th>
+                                <th style="width: 15%">Salary</th>
+                                <th style="width: 10%">Age</th>
+                                <th style="width: 15%">Hire Date</th>
+                                <th style="width: 10%">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for employee in employees %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="employee-avatar">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="ms-3">
+                                            <div class="employee-name">{{ employee.name }}</div>
+                                            <div class="employee-description">{{ employee.description|truncatechars:40 }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ employee.position }}</td>
+                                <td>${{ employee.salary }}</td>
+                                <td>{{ employee.age }}</td>
+                                <td>{{ employee.hire_date }}</td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{% url 'employee_update' employee.pk %}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'employee_delete' employee.pk %}" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="empty-state">
+                                        <i class="fas fa-users fa-3x mb-3 text-muted"></i>
+                                        <h4>No Employees Found</h4>
+                                        <p class="text-muted">Start by adding your first employee</p>
+                                        <a href="{% url 'employee_create' %}" class="btn btn-primary mt-3">
+                                            <i class="fas fa-user-plus me-2"></i>
+                                            Add New Employee
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .main-content {
+        padding: 1rem;
+    }
+
+    .dashboard-header {
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .back-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+        text-decoration: none;
+        transition: all var(--transition-speed) ease;
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+    }
+
+    .back-btn:hover {
+        transform: translateX(-3px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .back-btn {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+    }
+
+    [data-bs-theme="dark"] .back-btn:hover {
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .header-actions .btn {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        border: none;
+        transition: all var(--transition-speed) ease;
+    }
+
+    .header-actions .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .search-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .search-card {
+        background: #1e293b;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-form .input-group {
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .search-form .input-group {
+        background: #1e293b;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .search-form .form-control {
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .search-form .input-group-text {
+        border: none;
+        background: transparent;
+        padding: 0.75rem 1rem;
+    }
+
+    .search-form .btn {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .table-card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .table-card {
+        background: #1e293b;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .table {
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+
+    .table th {
+        font-weight: 600;
+        color: var(--text-secondary);
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        padding: 0.75rem;
+        white-space: nowrap;
+    }
+
+    [data-bs-theme="dark"] .table th {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .table td {
+        padding: 0.75rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .table td {
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .employee-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .employee-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+    }
+
+    .employee-description {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        line-height: 1.4;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.4rem;
+        border-radius: 0.4rem;
+        transition: all var(--transition-speed) ease;
+        font-size: 0.8rem;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 2rem 1rem;
+    }
+
+    .empty-state i {
+        color: var(--text-secondary);
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+    }
+
+    .empty-state h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+
+    .empty-state .btn {
+        padding: 0.6rem 1.25rem;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            padding: 0.75rem;
+        }
+
+        .dashboard-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .back-btn {
+            width: 32px;
+            height: 32px;
+        }
+
+        .header-actions .btn {
+            padding: 0.5rem 1rem;
+        }
+
+        .search-card,
+        .table-card {
+            padding: 0.75rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.6rem;
+        }
+
+        .employee-description {
+            display: none;
+        }
+
+        .action-buttons .btn {
+            padding: 0.35rem;
+        }
+    }
+</style>
+{% endblock %} 

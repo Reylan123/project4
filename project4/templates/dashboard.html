@@ -1,0 +1,802 @@
+{% extends 'employees/base.html' %}
+
+{% block title %}Dashboard - Employee Management{% endblock %}
+
+{% block extra_css %}
+<style>
+    .main-content {
+        margin-left: 280px;
+        padding: 0;
+        min-height: 100vh;
+        transition: all var(--transition-speed) ease;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    [data-bs-theme="dark"] .main-content {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+    }
+
+    .dashboard-container {
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 0;
+        padding: 1rem 2rem;
+        background: white;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+    }
+
+    [data-bs-theme="dark"] .dashboard-header {
+        background: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin: 0;
+    }
+
+    [data-bs-theme="dark"] .header-title {
+        color: #f8fafc;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        background: transparent;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        transition: all var(--transition-speed) ease;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    [data-bs-theme="dark"] .header-btn {
+        color: #f8fafc;
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .header-btn:hover {
+        background: rgba(99, 102, 241, 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    [data-bs-theme="dark"] .header-btn:hover {
+        background: rgba(99, 102, 241, 0.2);
+    }
+
+    .header-btn i {
+        font-size: 1rem;
+    }
+
+    .settings-dropdown {
+        position: relative;
+    }
+
+    .settings-menu {
+        position: absolute;
+        top: 100%;
+        right: 0;
+        margin-top: 0.5rem;
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        min-width: 200px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all var(--transition-speed) ease;
+        z-index: 1000;
+    }
+
+    [data-bs-theme="dark"] .settings-menu {
+        background: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .settings-dropdown.active .settings-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    .settings-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    [data-bs-theme="dark"] .settings-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .settings-user {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .settings-user i {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+    }
+
+    .settings-user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .settings-user-name {
+        font-weight: 600;
+        color: var(--text-primary);
+        font-size: 0.875rem;
+    }
+
+    [data-bs-theme="dark"] .settings-user-name {
+        color: #f8fafc;
+    }
+
+    .settings-user-role {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+    }
+
+    [data-bs-theme="dark"] .settings-user-role {
+        color: #94a3b8;
+    }
+
+    .settings-menu-items {
+        padding: 0.5rem;
+    }
+
+    .settings-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: 0.5rem;
+        transition: all var(--transition-speed) ease;
+        font-size: 0.875rem;
+    }
+
+    [data-bs-theme="dark"] .settings-item {
+        color: #f8fafc;
+    }
+
+    .settings-item:hover {
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--primary-color);
+    }
+
+    [data-bs-theme="dark"] .settings-item:hover {
+        background: rgba(99, 102, 241, 0.2);
+    }
+
+    .settings-item.logout {
+        color: #ef4444;
+    }
+
+    .settings-item.logout:hover {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+    }
+
+    [data-bs-theme="dark"] .settings-item.logout:hover {
+        background: rgba(239, 68, 68, 0.2);
+    }
+
+    .settings-item i {
+        font-size: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .welcome-card {
+        background: white;
+        border: none;
+        border-radius: 1.5rem;
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        color: var(--text-primary);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        position: relative;
+        overflow: hidden;
+    }
+
+    [data-bs-theme="dark"] .welcome-card {
+        background: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .welcome-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 300px;
+        height: 300px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        opacity: 0.1;
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    [data-bs-theme="dark"] .welcome-card::before {
+        opacity: 0.15;
+    }
+
+    .welcome-card h1 {
+        font-size: 2.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: -0.02em;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        line-height: 1.2;
+    }
+
+    .welcome-card p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+        max-width: 600px;
+        line-height: 1.6;
+        letter-spacing: 0.01em;
+    }
+
+    [data-bs-theme="dark"] .welcome-card p {
+        color: #94a3b8;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+        background: white;
+        border: none;
+        border-radius: 1.5rem;
+        padding: 2rem;
+        transition: all var(--transition-speed) ease;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .stat-card {
+        background: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 150px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        opacity: 0.05;
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    [data-bs-theme="dark"] .stat-card::before {
+        opacity: 0.15;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    [data-bs-theme="dark"] .stat-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .stat-card .icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+        font-size: 1.5rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+    }
+
+    .stat-card .icon.employees {
+        background: linear-gradient(135deg, #3b82f6, #60a5fa);
+    }
+
+    .stat-card .icon.positions {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+    }
+
+    .stat-card .icon.hires {
+        background: linear-gradient(135deg, #ec4899, #f472b6);
+    }
+
+    .stat-card h3 {
+        font-size: 2.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+
+    [data-bs-theme="dark"] .stat-card h3 {
+        color: #f8fafc;
+    }
+
+    .stat-card p {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        margin-bottom: 0;
+        position: relative;
+        z-index: 1;
+        letter-spacing: 0.01em;
+        font-weight: 500;
+    }
+
+    [data-bs-theme="dark"] .stat-card p {
+        color: #94a3b8;
+    }
+
+    .quick-actions {
+        background: white;
+        border: none;
+        border-radius: 1.5rem;
+        padding: 2.5rem;
+        margin-top: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    [data-bs-theme="dark"] .quick-actions {
+        background: #1e293b;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .quick-actions::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        opacity: 0.05;
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+
+    [data-bs-theme="dark"] .quick-actions::before {
+        opacity: 0.15;
+    }
+
+    .quick-actions h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 2rem;
+        color: var(--text-primary);
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.01em;
+    }
+
+    [data-bs-theme="dark"] .quick-actions h2 {
+        color: #f8fafc;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.75rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        transition: all var(--transition-speed) ease;
+        text-decoration: none;
+        font-size: 0.95rem;
+        letter-spacing: 0.01em;
+    }
+
+    .action-btn.primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+        color: white;
+    }
+
+    .action-btn.secondary {
+        background: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    [data-bs-theme="dark"] .action-btn.secondary {
+        background: #1e293b;
+        color: #f8fafc;
+        border-color: #f8fafc;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.2);
+    }
+
+    [data-bs-theme="dark"] .action-btn:hover {
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .action-btn.primary:hover {
+        color: white;
+    }
+
+    .action-btn.secondary:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    [data-bs-theme="dark"] .action-btn.secondary:hover {
+        background: #f8fafc;
+        color: #1e293b;
+    }
+
+    .action-btn i {
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin-left: 0;
+            padding-top: 4rem;
+        }
+
+        .dashboard-header {
+            padding: 1rem;
+        }
+
+        .dashboard-content {
+            padding: 1rem;
+        }
+
+        .welcome-card {
+            padding: 2rem;
+        }
+
+        .welcome-card h1 {
+            font-size: 1.75rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .action-btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    /* Responsive Navbar Styles */
+    .navbar-toggle {
+        display: none;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1000;
+        background: white;
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all var(--transition-speed) ease;
+    }
+
+    [data-bs-theme="dark"] .navbar-toggle {
+        background: #1e293b;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .navbar-toggle i {
+        font-size: 1.25rem;
+        color: var(--text-primary);
+    }
+
+    [data-bs-theme="dark"] .navbar-toggle i {
+        color: #f8fafc;
+    }
+
+    .navbar-toggle:hover {
+        background: rgba(99, 102, 241, 0.1);
+    }
+
+    [data-bs-theme="dark"] .navbar-toggle:hover {
+        background: rgba(99, 102, 241, 0.2);
+    }
+
+    @media (max-width: 768px) {
+        .navbar-toggle {
+            display: block;
+        }
+
+        .main-content {
+            margin-left: 0;
+            padding: 1rem;
+            padding-top: 4rem;
+        }
+
+        .sidebar {
+            transform: translateX(-100%);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 999;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 998;
+            opacity: 0;
+            transition: opacity var(--transition-speed) ease;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<button class="navbar-toggle" id="sidebarToggle">
+    <i class="fas fa-bars"></i>
+</button>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+{% include 'employees/sidebar.html' %}
+
+<div class="main-content">
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <div class="header-left">
+                <h1 class="header-title" style="font-size: 1.75rem; font-weight: 700; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></h1>
+            </div>
+            <div class="header-right">
+                <div class="header-actions">
+                    <button class="header-btn">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </button>
+                    <div class="settings-dropdown">
+                        <button class="header-btn" onclick="this.parentElement.classList.toggle('active')">
+                            <i class="fas fa-user-circle"></i>
+                            Admin User
+                        </button>
+                        <div class="settings-menu">
+                            <div class="settings-header">
+                                <div class="settings-user">
+                                    <i class="fas fa-user-circle"></i>
+                                    <div class="settings-user-info">
+                                        <span class="settings-user-name">{{ request.user.username }}</span>
+                                        <span class="settings-user-role">Administrator</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-menu-items">
+                                <a href="#" class="settings-item">
+                                    <i class="fas fa-user"></i>
+                                    My Profile
+                                </a>
+                                <a href="{% url 'password_change' %}" class="settings-item">
+                                    <i class="fas fa-key"></i>
+                                    Change Password
+                                </a>
+                                <a href="#" class="settings-item">
+                                    <i class="fas fa-shield-alt"></i>
+                                    Security
+                                </a>
+                                <a href="#" class="settings-item theme-toggle">
+                                    <i class="fas fa-moon"></i>
+                                    <span class="theme-text">Dark Mode</span>
+                                </a>
+                                <a href="{% url 'logout' %}" class="settings-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="welcome-card">
+                <h1>👋 Welcome to your Dashboard</h1>
+                <p>Manage your employees and track their information efficiently</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon employees">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>{{ total_employees }}</h3>
+                    <p>Total Employees</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon positions">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>{{ positions }}</h3>
+                    <p>Unique Positions</p>
+                </div>
+
+                <div class="stat-card">
+                    <div class="icon hires">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>{{ recent_hires }}</h3>
+                    <p>Recent Hires</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+        const dropdowns = document.querySelectorAll('.settings-dropdown');
+        dropdowns.forEach(dropdown => {
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+    });
+
+    // Theme toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const themeToggle = document.querySelector('.theme-toggle');
+        const themeIcon = themeToggle.querySelector('i');
+        const themeText = themeToggle.querySelector('.theme-text');
+        const html = document.documentElement;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            html.setAttribute('data-bs-theme', savedTheme);
+            updateThemeUI(savedTheme === 'dark');
+        }
+
+        themeToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const isDark = html.getAttribute('data-bs-theme') === 'dark';
+            const newTheme = isDark ? 'light' : 'dark';
+            
+            html.setAttribute('data-bs-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeUI(!isDark);
+        });
+
+        function updateThemeUI(isDark) {
+            themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+        }
+    });
+
+    // Sidebar toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.querySelector('.main-content');
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+            document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+        }
+
+        sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
+        // Close sidebar when clicking a menu item on mobile
+        const menuItems = document.querySelectorAll('.sidebar .nav-link');
+        menuItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (window.innerWidth <= 768) {
+                    toggleSidebar();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    });
+</script>
+{% endblock %} 
